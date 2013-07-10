@@ -21,9 +21,8 @@
  *
  */
 
-if ( !class_exists( 'directory_walker' ) ) {
-
-	class directory_walker {
+if ( !class_exists( 'DirectoryWalker' ) ) {
+	class DirectoryWalker {
 
 		/**
 		 * @const	string	version number of this class
@@ -52,20 +51,19 @@ if ( !class_exists( 'directory_walker' ) ) {
 		static function get_file_list( $path, $recursive = false, $allowed_extensions = null ) {
 
 			// Validate and prep received parameters
-			if( !is_bool( $recursive ) ) {
+			if ( !is_bool( $recursive ) ) {
 				$recursive = false;
 			}
 
 			$ext_string = 'all';
 			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
-			if( isset( $allowed_extensions ) ) {
+			if ( isset( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
 			}
 
 			// Retrieve the file list if not in cache yet
-			if( !isset( self::$cache[$path][$recursive][$ext_string] ) ) {
-
-				if( count( $allowed_extensions ) > 0 ) {
+			if ( !isset( self::$cache[$path][$recursive][$ext_string] ) ) {
+				if ( count( $allowed_extensions ) > 0 ) {
 					self::$cache[$path][$recursive][$ext_string] = self::traverse_directory( $path, $recursive, $allowed_extensions );
 				}
 				else {
@@ -78,12 +76,12 @@ if ( !class_exists( 'directory_walker' ) ) {
 
 
 		/**
-         * Traverse a directory listing and return an array with file names
-         *
-         * Purposefully ignores directory entries starting with a '.' so as to prevent 'unsafe'
-         * files, such as .htaccess and higher directories getting in the list.
-         * Note: this also means that directories such as /.git/ and /.idea/ will be ignored too.
-         *
+		 * Traverse a directory listing and return an array with file names
+		 *
+		 * Purposefully ignores directory entries starting with a '.' so as to prevent 'unsafe'
+		 * files, such as .htaccess and higher directories getting in the list.
+		 * Note: this also means that directories such as /.git/ and /.idea/ will be ignored too.
+		 *
 		 * @param	string			$path
 		 * @param	bool			$recursive
 		 * @param	string|array	$allowed_extensions
@@ -94,30 +92,26 @@ if ( !class_exists( 'directory_walker' ) ) {
 		private static function traverse_directory( $path, $recursive = false, $allowed_extensions = null, $prefix = '', $file_list = array() ) {
 
 			$slash = ( strrchr( $path, DIRECTORY_SEPARATOR ) === DIRECTORY_SEPARATOR ? '' : DIRECTORY_SEPARATOR );
+			$list  = scandir( $path );
 
-			$list = scandir ( $path );
-
-			if( is_array( $list ) && count( $list ) > 0 ) {
-
-				foreach( $list as $filename ) {
-
+			if ( is_array( $list ) && count( $list ) > 0 ) {
+				foreach ( $list as $filename ) {
 					// Skip if the file is an 'unsafe' one such as .htaccess or
 					// higher directory references
-					if( strpos( $filename, '.' ) !== 0 ) {
-
+					if ( strpos( $filename, '.' ) !== 0 ) {
 						$path_to_file = $path . $slash . $filename;
 
 						// If it's a file, check against valid extensions and add to the list
-						if( is_file( $path_to_file ) === true ) {
-							if( !isset( $allowed_extensions ) ) {
+						if ( is_file( $path_to_file ) === true ) {
+							if ( !isset( $allowed_extensions ) ) {
 								$file_list[] = $prefix . $filename;
 							}
-							else if( self::is_allowed_file( $filename, $allowed_extensions ) === true ) {
+							else if ( self::is_allowed_file( $filename, $allowed_extensions ) === true ) {
 								$file_list[] = $prefix . $filename;
 							}
 						}
 						// If it's a directory and recursive is true, run this function on the subdirectory
-						elseif( is_dir( $path_to_file ) === true && $recursive === true) {
+						else if ( is_dir( $path_to_file ) === true && $recursive === true ) {
 							$file_list = self::traverse_directory( $path_to_file . DIRECTORY_SEPARATOR, $recursive, $allowed_extensions, $prefix . $filename . DIRECTORY_SEPARATOR, $file_list );
 						}
 
@@ -132,10 +126,10 @@ if ( !class_exists( 'directory_walker' ) ) {
 
 
 		/**
-         * Check if a file name has one of the allowed extensions
-         *
-         * Changed to allow for extensions such as tar.gz
-         *
+		 * Check if a file name has one of the allowed extensions
+		 *
+		 * Changed to allow for extensions such as tar.gz
+		 *
 		 * @param	string	$file_name
 		 * @param	array	$allowed_extensions
 		 * @return	bool
@@ -144,20 +138,20 @@ if ( !class_exists( 'directory_walker' ) ) {
 
 			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
 
-  			// All extensions allowed
-  			if( ! isset( $allowed_extensions ) ) {
+			// All extensions allowed
+			if ( ! isset( $allowed_extensions ) ) {
 				return true;
 			}
 			
 			// Otherwise we will have a valid array of strings as exts are prepped
-  			foreach( $allowed_extensions as $ext ) {
+			foreach ( $allowed_extensions as $ext ) {
 				/* @todo Should this use the below first version to get round different character lengths
 				 in utf-8 strings with lower- and higher case ? *test* */
 /*				$file_name = strtolower( $file_name );
 				$rpos = strrpos( $file_name, '.' . $ext );*/
 
 				$rpos = strripos( $file_name, '.' . $ext );
-				if( ( strlen( $file_name ) - strlen( $ext ) - 2 ) === $rpos ) {
+				if ( ( strlen( $file_name ) - strlen( $ext ) - 2 ) === $rpos ) {
 					return true;
 				}
 			}
@@ -167,25 +161,25 @@ if ( !class_exists( 'directory_walker' ) ) {
 
 
 		/**
-         * Validate and type cast the passed $allowed_extensions
-         *
-         * @todo - 	do we need to cache invalid lists => null as well,
+		 * Validate and type cast the passed $allowed_extensions
+		 *
+		 * @todo - 	do we need to cache invalid lists => null as well,
 		 * 			to avoid those having to validate over and over ?
-         *
+		 *
 		 * @param	mixed	$allowed_extensions
 		 * @return	array|null
 		 */
 		private static function validate_allowed_exts( $allowed_extensions = null ) {
 			
 			// Break quickly if there's nothing to validate
-  			if( !isset( $allowed_extensions ) ) {
+			if ( !isset( $allowed_extensions ) ) {
 				return $allowed_extensions;
 			}
 
 			// Check the cache
-			if( is_array( $allowed_extensions ) && sort( $allowed_extensions ) ) {
+			if ( is_array( $allowed_extensions ) && sort( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
-				if( isset( self::$exts[$ext_string] ) ) {
+				if ( isset( self::$exts[$ext_string] ) ) {
 					return self::$exts[$ext_string];
 				}
 			}
@@ -193,7 +187,7 @@ if ( !class_exists( 'directory_walker' ) ) {
 			/* Validate */
 
 			// Make sure it's an array
-			if( is_string( $allowed_extensions ) && $allowed_extensions !== '' ) {
+			if ( is_string( $allowed_extensions ) && $allowed_extensions !== '' ) {
 				$allowed_extensions = explode( ',', $allowed_extensions );
 			}
 			else {
@@ -201,29 +195,27 @@ if ( !class_exists( 'directory_walker' ) ) {
 			}
 			
 			// Nothing there, break
-			if( count( $allowed_extensions ) === 0 ) {
+			if ( count( $allowed_extensions ) === 0 ) {
 				return null;
 			}
 			
 			// Validate the values
 			$clean = array();
-			foreach( $allowed_extensions as $ext ) {
-
-				if( is_string( $ext ) ) {
-
+			foreach ( $allowed_extensions as $ext ) {
+				if ( is_string( $ext ) ) {
 					// Strip out a . at the start
 					$ext = trim( ltrim( $ext, '.' ) );
 					// Make the array content consistent
 					$ext = strtolower( $ext );
 
-					if( $ext !== '' ) {
+					if ( $ext !== '' ) {
 						$clean[] = $ext;
 					}
 				}
 			}
 			
 			// Nothing valid found, break
-			if( count( $clean ) === 0 ) {
+			if ( count( $clean ) === 0 ) {
 				return null;
 			}
 
@@ -236,56 +228,53 @@ if ( !class_exists( 'directory_walker' ) ) {
 		}
 
 
-        /**
-         * Clear the file list cache for one set of parameters or clear the complete cache if no path is given
-         *
-         * @param	string			$path
-         * @param	bool			$recursive
-         * @param	string|array	$allowed_extensions
-         * @return	void
-         */
-        public static function clear_file_list( $path = null, $recursive = false, $allowed_extensions = null ) {
+		/**
+		 * Clear the file list cache for one set of parameters or clear the complete cache if no path is given
+		 *
+		 * @param	string			$path
+		 * @param	bool			$recursive
+		 * @param	string|array	$allowed_extensions
+		 * @return	void
+		 */
+		public static function clear_file_list( $path = null, $recursive = false, $allowed_extensions = null ) {
 
-            // Validate and prep received parameters
-            if( !is_bool( $recursive ) ) {
-                $recursive = false;
-            }
+			// Validate and prep received parameters
+			if ( !is_bool( $recursive ) ) {
+				$recursive = false;
+			}
 
-            $ext_string = 'all';
-            $allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
-            if( isset( $allowed_extensions ) ) {
-                $ext_string = implode( '_', $allowed_extensions );
-            }
+			$ext_string = 'all';
+			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
+			if ( isset( $allowed_extensions ) ) {
+				$ext_string = implode( '_', $allowed_extensions );
+			}
 
-            // Clear (selected) cache
-            if( is_string( $path ) ) {
-                unset( self::$cache[$path][$recursive][$ext_string] );
-            }
-            else {
-                self::$cache = array();
-            }
-        }
+			// Clear (selected) cache
+			if ( is_string( $path ) ) {
+				unset( self::$cache[$path][$recursive][$ext_string] );
+			}
+			else {
+				self::$cache = array();
+			}
+		}
 
 
-       /**
-         * Clear the validated extensions cache for one set of extensions or clear the complete cache if no set given
-         *
-         * @param	string|array	$allowed_extensions
-         * @return	void
-         */
-        public static function clear_valid_exts( $allowed_extensions = null ) {
+		/**
+		 * Clear the validated extensions cache for one set of extensions or clear the complete cache if no set given
+		 *
+		 * @param	string|array	$allowed_extensions
+		 * @return	void
+		 */
+		public static function clear_valid_exts( $allowed_extensions = null ) {
 			// Check the cache
-			if( ( isset( $allowed_extensions ) && is_array( $allowed_extensions ) ) && sort( $allowed_extensions ) ) {
+			if ( ( isset( $allowed_extensions ) && is_array( $allowed_extensions ) ) && sort( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
 				unset( self::$exts[$ext_string] );
 			}
 			else {
 				self::$exts = array();
 			}
-        }
-
-    } /* End of class */
-
+		}
+	} /* End of class */
 } /* End of class-exists wrapper */
-
 ?>

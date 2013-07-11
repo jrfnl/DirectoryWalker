@@ -1,41 +1,52 @@
 <?php
 /**
- * File: class.directory-walker.php
- * @package directory-walker
- *
- *
  * Simple Directory Walker
  *
  * Walks through a directory and retrieves the names of all files and directories
- * Optionally recursively walks child-directories
- * Optionally filter the retrieved list for files with comply with a list of allowed extensions
- * Results are cached for best performance
+ * - Optionally recursively walks child-directories
+ * - Optionally filter the retrieved list for files with comply with a list of allowed extensions
+ * - Results are cached for best performance
  *
- * @author	Juliette Reinders Folmer, {@link http://www.adviesenzo.nl/ Advies en zo} -
- *	<simple.directory.walker@adviesenzo.nl>
- *
- * @version	1.0
- * @since	2013-07-05 // Last changed on 2013-07-09 14:03:32 by Juliette Reinders Folmer
- * @copyright	2013 Advies en zo, Meedenken en -doen <simple.directory.walker@adviesenzo.nl>
- * @license http://www.opensource.org/licenses/lgpl-license.php GNU Lesser General Public License
- *
+ * File:		class.DirectoryWalker.php
+ * @package		DirectoryWalker
+ * @version		1.0
+ * @link		https://github.com/jrfnl/DirectoryWalker
+ * @author		Juliette Reinders Folmer, {@link http://www.adviesenzo.nl/ Advies en zo} -
+ *				<simple.directory.walker@adviesenzo.nl>
+ * @copyright	(c) 2013, Advies en zo, Meedenken en -doen <simple.directory.walker@adviesenzo.nl> All rights reserved
+ * @license		http://www.opensource.org/licenses/lgpl-license.php GNU Lesser General Public License
+ * @since		2013-07-03
  */
-
 if ( !class_exists( 'DirectoryWalker' ) ) {
+	/**
+	 * Simple Directory Walker
+	 *
+	 * @package		DirectoryWalker
+	 * @version		1.0
+	 * @link		https://github.com/jrfnl/DirectoryWalker
+	 * @author		Juliette Reinders Folmer, {@link http://www.adviesenzo.nl/ Advies en zo} -
+	 *				<simple.directory.walker@adviesenzo.nl>
+	 * @copyright	(c) 2013, Advies en zo, Meedenken en -doen <simple.directory.walker@adviesenzo.nl>
+	 *				All rights reserved
+	 * @license		http://www.opensource.org/licenses/lgpl-license.php GNU Lesser General Public License
+	 */
 	class DirectoryWalker {
 
 		/**
-		 * @const	string	version number of this class
+		 * Version number of this class
+		 * @type	string	VERSION		version number of this class
 		 */
 		const VERSION = '1.0';
 
 		/**
-		 * @var array	$cache
+		 * @static
+		 * @var		array	$cache		cache of retrieved file lists
 		 */
 		protected static $cache = array();
-		
+
 		/**
-		 * @var	array	$exts
+		 * @static
+		 * @var		array	$exts		cache of validated groups of allowed extensions
 		 */
 		protected static $exts = array();
 
@@ -43,12 +54,18 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		/**
   		 * Retrieve the (cached) file list for path
   		 *
+  		 * @uses	DirectoryWalker::$cache
+  		 * @uses	DirectoryWalker::validate_exts()
+  		 * @uses	DirectoryWalker::traverse_directory()
+  		 *
+  		 * @static
+  		 *
 		 * @param	string			$path
-		 * @param	bool			$recursive
+		 * @param	bool|null		$recursive
 		 * @param	string|array	$allowed_extensions
 		 * @return	array
 		 */
-		static function get_file_list( $path, $recursive = false, $allowed_extensions = null ) {
+		public static function get_file_list( $path, $recursive = false, $allowed_extensions = null ) {
 
 			// Validate and prep received parameters
 			if ( !is_bool( $recursive ) ) {
@@ -56,7 +73,7 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 			}
 
 			$ext_string = 'all';
-			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
+			$allowed_extensions = self::validate_exts( $allowed_extensions );
 			if ( isset( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
 			}
@@ -82,11 +99,16 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		 * files, such as .htaccess and higher directories getting in the list.
 		 * Note: this also means that directories such as /.git/ and /.idea/ will be ignored too.
 		 *
+  		 * @uses	DirectoryWalker::traverse_directory()
+  		 * @uses	DirectoryWalker::is_allowed_file()
+  		 *
+  		 * @static
+  		 *
 		 * @param	string			$path
 		 * @param	bool			$recursive
 		 * @param	string|array	$allowed_extensions
-		 * @param	string			$prefix
-		 * @param	array			$file_list
+		 * @param	string			$prefix			internal use
+		 * @param	array			$file_list		internal use
 		 * @return	array
 		 */
 		private static function traverse_directory( $path, $recursive = false, $allowed_extensions = null, $prefix = '', $file_list = array() ) {
@@ -127,8 +149,11 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 
 		/**
 		 * Check if a file name has one of the allowed extensions
+		 * Allows for extensions such as tar.gz
 		 *
-		 * Changed to allow for extensions such as tar.gz
+  		 * @uses	DirectoryWalker::validate_exts()
+  		 *
+  		 * @static
 		 *
 		 * @param	string	$file_name
 		 * @param	array	$allowed_extensions
@@ -136,22 +161,22 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		 */
 		public static function is_allowed_file( $file_name, $allowed_extensions = null ) {
 
-			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
+			$allowed_extensions = self::validate_exts( $allowed_extensions );
 
 			// All extensions allowed
 			if ( ! isset( $allowed_extensions ) ) {
 				return true;
 			}
 			
-			// Otherwise we will have a valid array of strings as exts are prepped
+			// Otherwise we will have a valid array of strings as extensions are prepped
 			foreach ( $allowed_extensions as $ext ) {
 				/* @todo Should this use the below first version to get round different character lengths
 				 in utf-8 strings with lower- and higher case ? *test* */
 /*				$file_name = strtolower( $file_name );
-				$rpos = strrpos( $file_name, '.' . $ext );*/
+				$pos = strrpos( $file_name, '.' . $ext );*/
 
-				$rpos = strripos( $file_name, '.' . $ext );
-				if ( ( strlen( $file_name ) - strlen( $ext ) - 2 ) === $rpos ) {
+				$pos = strripos( $file_name, '.' . $ext );
+				if ( ( strlen( $file_name ) - strlen( $ext ) - 1 ) === $pos ) {
 					return true;
 				}
 			}
@@ -163,13 +188,17 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		/**
 		 * Validate and type cast the passed $allowed_extensions
 		 *
-		 * @todo - 	do we need to cache invalid lists => null as well,
+		 * @todo - 	Determine if we need to cache invalid lists => null as well,
 		 * 			to avoid those having to validate over and over ?
 		 *
-		 * @param	mixed	$allowed_extensions
+  		 * @uses	DirectoryWalker::$exts
+  		 *
+  		 * @static
+		 *
+		 * @param	string|array|null	$allowed_extensions
 		 * @return	array|null
 		 */
-		private static function validate_allowed_exts( $allowed_extensions = null ) {
+		private static function validate_exts( $allowed_extensions = null ) {
 			
 			// Break quickly if there's nothing to validate
 			if ( !isset( $allowed_extensions ) ) {
@@ -231,6 +260,11 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		/**
 		 * Clear the file list cache for one set of parameters or clear the complete cache if no path is given
 		 *
+  		 * @uses	DirectoryWalker::$cache
+  		 * @uses	DirectoryWalker::validate_exts()
+  		 *
+  		 * @static
+		 *
 		 * @param	string			$path
 		 * @param	bool			$recursive
 		 * @param	string|array	$allowed_extensions
@@ -244,7 +278,7 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 			}
 
 			$ext_string = 'all';
-			$allowed_extensions = self::validate_allowed_exts( $allowed_extensions );
+			$allowed_extensions = self::validate_exts( $allowed_extensions );
 			if ( isset( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
 			}
@@ -262,10 +296,14 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		/**
 		 * Clear the validated extensions cache for one set of extensions or clear the complete cache if no set given
 		 *
+  		 * @uses	DirectoryWalker::$exts
+  		 *
+  		 * @static
+  		 *
 		 * @param	string|array	$allowed_extensions
 		 * @return	void
 		 */
-		public static function clear_valid_exts( $allowed_extensions = null ) {
+		public static function clear_exts( $allowed_extensions = null ) {
 			// Check the cache
 			if ( ( isset( $allowed_extensions ) && is_array( $allowed_extensions ) ) && sort( $allowed_extensions ) ) {
 				$ext_string = implode( '_', $allowed_extensions );

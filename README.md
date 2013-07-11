@@ -9,4 +9,4 @@ Simple Directory Walker
 
 Results are cached for best performance
 
-Please refer to the documentation in the [/docs/ folder](https://github.com/jrfnl/DirectoryWalker/tree/master/docs) for more information.
+Please refer to the documentation in the [wiki](https://github.com/jrfnl/DirectoryWalker/wiki) for more information.

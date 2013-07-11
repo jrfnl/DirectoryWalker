@@ -223,3 +223,4 @@ class DirectoryWalkerTests extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty( PHPUnit_Framework_Assert::readAttribute( 'DirectoryWalker', 'exts' ) );
 	}
 }
+?>

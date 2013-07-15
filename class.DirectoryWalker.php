@@ -54,6 +54,10 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		/**
   		 * Retrieve the (cached) file list for path
   		 *
+  		 * @todo	Check how optimized scandir() is and whether it would be useful to get a list
+		 *			of all files first and only later filter for allowed extensions / subdirs
+  		 *
+  		 *
   		 * @uses	DirectoryWalker::$cache
   		 * @uses	DirectoryWalker::validate_exts()
   		 * @uses	DirectoryWalker::traverse_directory()

@@ -231,7 +231,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">static clear_exts</span> (line <span class="line-number">306</span>)
+		<span class="method-title">static clear_exts</span> (line <span class="line-number">310</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -261,7 +261,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">static clear_file_list</span> (line <span class="line-number">273</span>)
+		<span class="method-title">static clear_file_list</span> (line <span class="line-number">277</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -298,16 +298,17 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">static get_file_list</span> (line <span class="line-number">68</span>)
+		<span class="method-title">static get_file_list</span> (line <span class="line-number">72</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
 <p class="short-description">Retrieve the (cached) file list for path</p>
 	<ul class="tags">
+				<li><span class="field">todo:</span> Check how optimized scandir() is and whether it would be useful to get a list             of all files first and only later filter for allowed extensions / subdirs</li>
 				<li><span class="field">access:</span> public</li>
-				<li><span class="field">uses:</span> <a href="../DirectoryWalker/DirectoryWalker.html#methodvalidate_exts">DirectoryWalker::validate_exts()</a></li>
 				<li><span class="field">uses:</span> <a href="../DirectoryWalker/DirectoryWalker.html#methodtraverse_directory">DirectoryWalker::traverse_directory()</a></li>
 				<li><span class="field">uses:</span> <a href="../DirectoryWalker/DirectoryWalker.html#var$cache">DirectoryWalker::$cache</a></li>
+				<li><span class="field">uses:</span> <a href="../DirectoryWalker/DirectoryWalker.html#methodvalidate_exts">DirectoryWalker::validate_exts()</a></li>
 			</ul>
 	
 	<div class="method-signature">
@@ -336,7 +337,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">static is_allowed_file</span> (line <span class="line-number">162</span>)
+		<span class="method-title">static is_allowed_file</span> (line <span class="line-number">166</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -370,7 +371,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">static traverse_directory</span> (line <span class="line-number">114</span>)
+		<span class="method-title">static traverse_directory</span> (line <span class="line-number">118</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -416,7 +417,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">static validate_exts</span> (line <span class="line-number">201</span>)
+		<span class="method-title">static validate_exts</span> (line <span class="line-number">205</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -488,7 +489,7 @@
 	</div>
 
 	<p class="notes" id="credit">
-		Documentation generated on Fri, 12 Jul 2013 00:01:21 +0200 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+		Documentation generated on Tue, 16 Jul 2013 17:16:03 +0200 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
 	</p>
 	</div></body>
 </html>

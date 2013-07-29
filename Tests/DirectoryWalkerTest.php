@@ -74,6 +74,11 @@ class DirectoryWalkerTests extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty( PHPUnit_Framework_Assert::readAttribute( 'DirectoryWalker', 'exts' ) );
 
 
+		// Wrong path to directory
+		$path = dirname( __FILE__ ) . $d . '_invalid' . $d;
+		$this->assertFalse( DirectoryWalker::get_file_list( $path ) );
+		unset( $path );
+
 		// Empty directory
 		$path = dirname( __FILE__ ) . $d . '_empty' . $d;
 		$this->assertEmpty( DirectoryWalker::get_file_list( $path ) );
@@ -167,7 +172,8 @@ class DirectoryWalkerTests extends PHPUnit_Framework_TestCase {
 
 		/* These tests need to be run here as otherwise we have no cache to test against
 		 - actually why don't we have that cache ? is that PHPUnit specific or is something else going wrong ?
-		 => Look like every test is being run against a new instance of this class, so we don't have *this* cache, cache in class being tested is there and correct */
+		 => Looks like every test is being run against a new instance of this class, so we don't have *this* cache, cache in class being tested is there and correct.
+		 May be use the @depends tag to fix this ? */
 
 		// Has one specific cache been cleared ?
 		unset( $this->cache[TEST_FILES_PATH][true]['all'] );

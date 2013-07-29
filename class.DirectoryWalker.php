@@ -9,7 +9,7 @@
  *
  * File:		class.DirectoryWalker.php
  * @package		DirectoryWalker
- * @version		1.0
+ * @version		1.0.1
  * @link		https://github.com/jrfnl/DirectoryWalker
  * @author		Juliette Reinders Folmer, {@link http://www.adviesenzo.nl/ Advies en zo} -
  *				<simple.directory.walker@adviesenzo.nl>
@@ -67,7 +67,7 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 		 * @param	string			$path
 		 * @param	bool|null		$recursive
 		 * @param	string|array	$allowed_extensions
-		 * @return	array
+		 * @return	array|false		File list array or false if an invalid path was provided
 		 */
 		public static function get_file_list( $path, $recursive = false, $allowed_extensions = null ) {
 
@@ -82,8 +82,21 @@ if ( !class_exists( 'DirectoryWalker' ) ) {
 				$ext_string = implode( '_', $allowed_extensions );
 			}
 
+			// Validate the path
+			if ( !is_string( $path ) || ( !is_dir( $path ) /* || !is_readable( $path ) */ ) ) {
+				// Try with an added directory separator
+				if ( !is_string( $path . DIRECTORY_SEPARATOR ) || ( !is_dir( $path . DIRECTORY_SEPARATOR ) /* || !is_readable( $path . DIRECTORY_SEPARATOR ) */ ) ) {
+					return false;
+				}
+				else {
+					$path =  $path . DIRECTORY_SEPARATOR;
+				}
+			}
+
+
 			// Retrieve the file list if not in cache yet
 			if ( !isset( self::$cache[$path][$recursive][$ext_string] ) ) {
+
 				if ( count( $allowed_extensions ) > 0 ) {
 					self::$cache[$path][$recursive][$ext_string] = self::traverse_directory( $path, $recursive, $allowed_extensions );
 				}
